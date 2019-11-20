@@ -2,7 +2,7 @@ disp('"Dispersion Model by Devansh Messon"')
 
  
  
-%----------------------------------execution-------------------------------
+%----------------------------------execution--------------------------------
 S = shaperead('IND_adm3.shp','UseGeoCoords', true);
 geoshow(S);
 datacursormode on
