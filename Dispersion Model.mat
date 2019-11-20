@@ -1,0 +1,57 @@
+disp('"Dispersion Model by Devansh Messon"')
+
+ 
+ 
+%----------------------------------execution-------------------------------
+S = shaperead('IND_adm3.shp','UseGeoCoords', true);
+geoshow(S);
+datacursormode on
+dcm_obj = datacursormode;
+set(dcm_obj,'UpdateFcn',@myupdatefcn)
+disp('Click line to display a data tip, then press "Return"')
+pause 
+% Export cursor to workspace
+info_struct = getCursorInfo(dcm_obj);
+if isfield(info_struct, 'Position')
+  disp('Clicked positioin is')
+  disp(info_struct.Position)
+  g=info_struct.Position;
+end
+prompt = 'Enter the diffusivity (Dy):';
+Dy= input(prompt)
+prompt1 = 'Enter the diffusivity (Dz):';
+Dz= input(prompt1)      
+prompt2 = 'Enter the wind velocity where the dispersion has taken place:';
+v= input(prompt2)                
+lambda = 0;                
+Q = 1;                      
+xstack = 10 ; ystack = 50;   
+ z = 1;
+prompt3= 'Enter the Height of observation (=0 for ground surface):'
+H= input(prompt3)                     
+[x,y] = meshgrid (linspace(10,1000,100),linspace(10,100,100));
+c = zeros (size(x)); e = ones(size(x));
+for i = 1:size(Q,2)
+    xx = x - xstack(i); yy = y - ystack(i); 
+    c = c + Q(i)*e./(4*pi*xx*sqrt(Dy*Dz)).*exp(-v*yy.*yy./(4*Dy*xx)).*... 
+    (exp(-v*(z-H(i))*(z-H(i))*e./(4*Dz*xx))+exp(-v*(z+H(i))*(z+H(i))*e./(4*Dz*xx)))...
+    .*exp(-lambda*xx/v);
+end
+%----------------------------------output----------------------------------
+
+hold on;
+surf (c); colormap(jet(256));
+ 
+ 
+   
+
+function output_txt = myupdatefcn(~,event_obj)
+  % ~            Currently not used (empty)
+  % event_obj    Object containing event data structure
+  % output_txt   Data cursor text
+  pos = get(event_obj, 'Position');
+  output_txt = {['x: ' num2str(pos(1))], ['y: ' num2str(pos(2))]};
+  a=num2str(pos(1));
+  b= num2str(pos(2));
+end
+
